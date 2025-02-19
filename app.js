@@ -48,6 +48,7 @@ function checkToken(req, res, next) {
 }
 
 app.post("/auth/register", async (req, res) => {
+  //POST(POSTAR)
   const { name, email, password, confirmpassword } = req.body; // Corrigido: desestruturando do req.body
 
   if (!name) {
@@ -109,14 +110,15 @@ app.post("/auth/login", async (req, res) => {
 
   const user = await User.findOne({ email: email });
 
-  if (!User) {
+  if (!user) {
+    // Mudança: Corrigido de "User" para "user"
     return res.status(404).json({ msg: "Usuário não cadastrado!" });
   }
 
   const checkPassword = await bcrypt.compare(password, user.password);
 
   if (!checkPassword) {
-    return res.status(442).json({ msg: "Senha inválido!" });
+    return res.status(442).json({ msg: "Senha inválida!" }); // Corrigido a mensagem de erro
   }
 
   // Criar um Env secret para evitar invasões
@@ -129,11 +131,9 @@ app.post("/auth/login", async (req, res) => {
       },
       secret
     );
-    res
-      .status(200)
-      .json({ msg: "Autentificação realizada com sucesso!", token });
+    res.status(200).json({ msg: "Autenticação realizada com sucesso!", token });
   } catch (error) {
-    res.status(500).json({ msg: error });
+    res.status(500).json({ msg: error.message });
   }
 });
 
